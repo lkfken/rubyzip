@@ -107,12 +107,15 @@ module Zip
       @size                                         = Entry.read_zip_short(buf)
       @size_in_bytes                                = Entry.read_zip_long(buf)
       @cdir_offset                                  = Entry.read_zip_long(buf)
-      comment_length                                = Entry.read_zip_short(buf)
+      comment_length                                = Entry.read_zip_long(buf)
       @comment                                      = if comment_length.to_i <= 0
                                                         buf.slice!(0, buf.size)
                                                       else
                                                         buf.read(comment_length)
                                                       end
+      after_comment_garbage_length = buf.size
+      @after_comment_garbage = buf.slice!(0, after_comment_garbage_length)
+
       raise Error, 'Zip consistency problem while reading eocd structure' unless buf.empty?
     end
 
